@@ -22,6 +22,8 @@ public:
   // EDAnalyzer interface
   virtual void beginJob();
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
+  virtual void respondToCloseInputFile(edm::FileBlock const& fb);
+  virtual void respondToOpenInputFile(edm::FileBlock const& fb);
   virtual void endJob();
 
   // provide cached fed collection (and run/evt number, if needed!)
@@ -66,6 +68,8 @@ private:
   unsigned int           writeIndex_;
   unsigned int           readIndex_;
   bool                   freeToEof_;
+
+  bool					 inputFileClosed_;
 };
 
 

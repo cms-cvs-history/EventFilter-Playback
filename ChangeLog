@@ -1,3 +1,11 @@
+2011-10-12  Andrei Spataru <andrei.cristian.spataru@cern.ch>
+
+	* added inputFileClosed_ flag that reports the current
+	  state of the input file. The flag gets switched by the
+	  added methods respondToCloseInputFile and respondToOpenInputFile.
+	* getFEDRawData methods return 0 if the input file is closed
+	  at call time.
+
 2007-10-11  Emilio Meschi <emilio.meschi@cern.ch>
 
 	* tag V00-02-00

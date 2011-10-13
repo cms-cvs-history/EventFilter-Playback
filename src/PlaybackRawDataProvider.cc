@@ -37,6 +37,7 @@ PlaybackRawDataProvider::PlaybackRawDataProvider(const ParameterSet& iConfig)
   , writeIndex_(0)
   , readIndex_(0)
   , freeToEof_(false)
+  , inputFileClosed_(false)
 {
   queueSize_=iConfig.getUntrackedParameter<unsigned int>("queueSize",32);
   sem_init(&lock_,0,1);
@@ -111,25 +112,40 @@ void PlaybackRawDataProvider::analyze(const Event& iEvent,
   return;
 }
 
-
 //______________________________________________________________________________
 void PlaybackRawDataProvider::beginJob()
 {
-  
+
 }
 
+//______________________________________________________________________________
+
+void PlaybackRawDataProvider::respondToCloseInputFile(edm::FileBlock const& fb)
+{
+	inputFileClosed_ = true;
+	std::cout << "Input file: CLOSED!" << std::endl;
+}
+
+//______________________________________________________________________________
+
+void PlaybackRawDataProvider::respondToOpenInputFile(edm::FileBlock const& fb)
+{
+	inputFileClosed_ = false;
+	std::cout << "Input file: OPEN!" << std::endl;
+}
 
 //______________________________________________________________________________
 void PlaybackRawDataProvider::endJob()
+
 {
   edm::LogInfo("Summary")<<count_<<" events read."<<endl;
 }
-
 
 //______________________________________________________________________________
 FEDRawDataCollection* PlaybackRawDataProvider::getFEDRawData()
 {
   FEDRawDataCollection* result = 0;
+  if (inputFileClosed_) return result;
   waitReadSem();
   lock();
   result = eventQueue_[readIndex_];
@@ -148,6 +164,7 @@ FEDRawDataCollection* PlaybackRawDataProvider::getFEDRawData(unsigned int& runNu
 {
 
   FEDRawDataCollection* result = 0;
+  if (inputFileClosed_) return result;
   waitReadSem();
   lock();
   runNumber=runNumber_[readIndex_];
